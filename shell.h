@@ -1,61 +1,45 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+#include <unistd.h>
 #include <sys/stat.h>
-#include <time.h>
-#include <stdbool.h>
+#include <sys/wait.h>
+#include <signal.h>
 
-/* environment variables */
-extern char **environ;
-extern __sighandler_t signal(int __sig, __sighandler_t __handler);
+/**
+ * struct path_s - singly linked list for path
+ * @path: information of each part of the path
+ * @next: pointer to the next node
+ *
+ */
+typedef struct path_s
+{
+	char *path;
+	struct path_s *next;
 
-/* handle built ins */
-int checker(char **cmd, char *buf);
-void prompt_user(void);
-void handle_signal(int m);
-char **tokenizer(char *line);
-char *test_path(char **path, char *command);
-char *append_path(char *path, char *command);
-int handle_builtin(char **command, char *line);
-void exit_cmd(char **command, char *line);
+} paths_t;
 
-void print_env(void);
-
-/* string handlers */
+void shell(char **argv, char *envp[]);
+void exec_args(char *, char **, char **, char **, paths_t *);
+paths_t *get_path(char **env);
+paths_t *create_struct(paths_t **head, char *str);
+void parse_text(char *str, char **parsed);
+void parse_text_path(char *str, char **parsed);
+void func_exit(char *buffer, char **parsed, paths_t *p_path_string);
+void free_list(paths_t *head);
+void free_parsed(char **parsed);
 int _strcmp(char *s1, char *s2);
+char *_strdup(char *str);
+char *_strcat(char *dest, char *src);
+char *_strcpy(char *dest, char *src);
+int _atoi(char *s);
 int _strlen(char *s);
-int _strncmp(char *s1, char *s2, int n);
-char *_strdup(char *s);
-char *_strchr(char *s, char c);
+char *check_path(char **parsed, paths_t *h);
+void call_func(char *, char **, char **, char **, paths_t *);
+char *str_concat(char *s1, char *s2);
 
-void execution(char *cp, char **cmd);
-char *find_path(void);
-
-/* helper function for efficient free */
-void free_buffers(char **buf);
-
-struct builtin
-{
-	char *env;
-	char *exit;
-} builtin;
-
-struct info
-{
-	int final_exit;
-	int ln_count;
-} info;
-
-struct flags
-{
-	bool interactive;
-} flags;
-
-#endif /* SHELL_H */
+#endif
